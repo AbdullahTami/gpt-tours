@@ -102,11 +102,13 @@ export async function getAllTours(searchTerm) {
         {
           city: {
             contains: searchTerm,
+            mode: "insensitive",
           },
         },
         {
           country: {
             contains: searchTerm,
+            mode: "insensitive",
           },
         },
       ],
