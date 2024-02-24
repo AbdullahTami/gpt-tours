@@ -119,3 +119,11 @@ export async function getAllTours(searchTerm) {
   });
   return tours;
 }
+
+export async function getSingleTour(id) {
+  return prisma.tour.findUnique({
+    where: {
+      id,
+    },
+  });
+}
