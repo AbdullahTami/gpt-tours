@@ -1,19 +1,29 @@
 "use client";
 
-import { generateTourResponse } from "@/utlis/actions";
-import { useMutation } from "@tanstack/react-query";
+import {
+  createNewTour,
+  generateTourResponse,
+  getExistingTour,
+} from "@/utlis/actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import TourInfo from "./TourInfo";
 
 function NewTour() {
+  const queryClient = useQueryClient();
   const {
     mutate,
     isPending,
     data: tour,
   } = useMutation({
     mutationFn: async (destination) => {
+      const existingTour = await getExistingTour(destination);
+      if (existingTour) return existingTour;
+
       const newTour = await generateTourResponse(destination);
       if (newTour) {
+        await createNewTour(newTour);
+        queryClient.invalidateQueries({ queryKey: ["tours"] });
         return newTour;
       }
       toast.error("No matching city found...");

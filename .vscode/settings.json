@@ -1,3 +1,6 @@
 {
-  "cSpell.words": ["nextjs", "openai", "Openaigym", "tanstack", "utlis"]
+  "cSpell.words": ["nextjs", "openai", "Openaigym", "tanstack", "utlis"],
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }

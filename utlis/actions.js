@@ -1,6 +1,7 @@
 "use server";
 
 import OpenAI from "openai";
+import prisma from "./db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -67,4 +68,21 @@ If you can't find info on exact ${city}, or ${city} does not exist, or it's popu
     console.log(error);
     return null;
   }
+}
+
+export async function getExistingTour({ city, country }) {
+  return prisma.tour.findUnique({
+    where: {
+      city_country: {
+        city,
+        country,
+      },
+    },
+  });
+}
+
+export async function createNewTour(tour) {
+  return prisma.tour.create({
+    data: tour,
+  });
 }
