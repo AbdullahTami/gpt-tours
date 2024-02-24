@@ -22,13 +22,13 @@ function Chat() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!text) return;
+    if (!text.trim()) return;
     const query = { role: "user", content: text };
     createMessage(query);
     setMessages((messages) => [...messages, query]);
     setText("");
   }
-  console.log(messages);
+  // console.log(messages);
 
   return (
     <div className="min-h-[calc(100vh-6rem)] grid grid-rows-[1fr,auto]">
