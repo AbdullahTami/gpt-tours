@@ -1,23 +1,45 @@
 "use client";
 
-import { generateChatResponse } from "@/utlis/actions";
+import {
+  generateChatResponse,
+  getUserTokensById,
+  subtractTokens,
+} from "@/utlis/actions";
+import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 function Chat() {
+  const { userId } = useAuth();
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
 
   const { mutate: createMessage, isPending } = useMutation({
-    mutationFn: (query) => generateChatResponse([...messages, query]),
-    onSuccess: (data) => {
-      if (!data) {
-        toast.error("Something went wrong");
-        return;
+    mutationFn: async (query) => {
+      const currentTokens = await getUserTokensById(userId);
+      if (currentTokens < 100) {
+        toast.error("Token balance too low...");
+        return null;
       }
-      setMessages((messages) => [...messages, data]);
+      const response = await generateChatResponse([...messages, query]);
+      if (!response) {
+        toast.error("Something went wrong...");
+        return null;
+      }
+      setMessages((messages) => [...messages, response.message]);
+      const newTokens = await subtractTokens(userId, response.tokens);
+      toast.success(`${newTokens} tokens remaining`);
     },
+
+    // mutationFn: (query) => generateChatResponse([...messages, query]),
+    // onSuccess: (data) => {
+    //   if (!data) {
+    //     toast.error("Something went wrong");
+    //     return;
+    //   }
+    //   setMessages((messages) => [...messages, data]);
+    // },
   });
 
   function handleSubmit(e) {

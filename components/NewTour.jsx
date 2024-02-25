@@ -25,8 +25,9 @@ function NewTour() {
       if (existingTour) return existingTour;
 
       const currentTokens = await getUserTokensById(userId);
-      if (currentTokens < 300) {
+      if (currentTokens <300) {
         toast.error("Token balance too low...");
+        return null;
       }
 
       const newTour = await generateTourResponse(destination);

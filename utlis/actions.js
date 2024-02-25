@@ -23,7 +23,10 @@ export async function generateChatResponse(chatMessages) {
       temperature: 0,
       max_tokens: 100,
     });
-    return response.choices[0].message;
+    return {
+      message: response.choices[0].message,
+      tokens: response.usage.total_tokens,
+    };
   } catch (error) {
     console.log(error);
     return null;
