@@ -127,3 +127,17 @@ export async function getSingleTour(id) {
     },
   });
 }
+
+export async function generateTourImage({ city, country }) {
+  try {
+    const TourImage = await openai.images.generate({
+      prompt: `a panoramic view of the ${city} ${country}`,
+      n: 1,
+      size: "512x512",
+    });
+    return TourImage?.data[0].url;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
