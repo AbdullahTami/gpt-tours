@@ -2,6 +2,7 @@
 
 import OpenAI from "openai";
 import prisma from "./db";
+import { revalidatePath } from "next/cache";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -20,6 +21,7 @@ export async function generateChatResponse(chatMessages) {
       ],
       model: "gpt-3.5-turbo",
       temperature: 0,
+      max_tokens: 100,
     });
     return response.choices[0].message;
   } catch (error) {
@@ -140,4 +142,43 @@ export async function generateTourImage({ city, country }) {
     console.log(error);
     return null;
   }
+}
+
+export async function getUserTokensById(clerkId) {
+  const result = await prisma.token.findUnique({
+    where: { clerkId },
+  });
+
+  return result?.tokens;
+}
+
+export async function generateUserTokensForId(clerkId) {
+  const result = await prisma.token.create({
+    data: {
+      clerkId,
+    },
+  });
+  return result?.tokens;
+}
+
+export async function fetchOrGenerateTokens(clerkId) {
+  const result = await getUserTokensById(clerkId);
+  if (result) return result.tokens;
+
+  return (await generateUserTokensForId(clerkId)).tokens;
+}
+
+export async function subtractTokens(clerkId, tokens) {
+  const result = await prisma.token.update({
+    where: {
+      clerkId,
+    },
+    data: {
+      tokens: {
+        decrement: tokens,
+      },
+    },
+  });
+  revalidatePath("/profile");
+  return result.tokens;
 }

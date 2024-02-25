@@ -23,3 +23,8 @@ model tour {
 
   @@unique([city, country])
 }
+
+model token {
+  clerkId String @id
+  tokens  Int    @default(1000)
+}
